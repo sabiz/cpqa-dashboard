@@ -42,7 +42,7 @@ export function getString(buf: Buffer): string {
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const lib = ffi.Library('FTD2XX',{
-    'FT_SetVIDPID': ['int', ['uint64', 'uint64']],
+    'FT_SetVIDPID': ['int', ['uint32', 'uint32']],
     'FT_ListDevices': ['int', [intRef, stringRef, 'uint']],
     'FT_Open': ['int', ['int', uint64Ref]],
     'FT_Purge': ['int', ['uint64', 'uint64']],
