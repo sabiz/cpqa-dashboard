@@ -160,6 +160,14 @@ export default class D2XX {
        return D2XX.checkErrorStatus(this.ftStatus);
     }
 
+    static addCustomDeviceId(vendorId: number, productId: number): boolean {
+        const ftStatus = FTD2XX.FT_SetVIDPID(vendorId, productId);
+        if(D2XX.checkErrorStatus(ftStatus)) {
+            return false;
+        }
+        return true;
+    }
+
     static getDeviceCount(): [boolean, number?] {
         const deviceCount = FTD2XX.allocInt();
         const ftStatus = FTD2XX.FT_ListDevices(deviceCount, null, FTD2XX.FT_LIST_NUMBER_ONLY);

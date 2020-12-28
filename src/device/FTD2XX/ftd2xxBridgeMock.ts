@@ -4,6 +4,10 @@ import * as crypto from 'crypto';
 export const localFtd2xxBridge = {...ftd2xxBridge};
 
 /* eslint-disable  @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
+localFtd2xxBridge['FT_SetVIDPID'] = function(a: number, b: number) :number {
+    return ftd2xxBridge.FT_OK;
+}
+
 localFtd2xxBridge['FT_ListDevices'] = function(buff: Buffer, b: any, c: any) :number {
     buff[0] = 1;
     return ftd2xxBridge.FT_OK;
@@ -37,9 +41,7 @@ localFtd2xxBridge['FT_SetTimeouts'] = function(a: number, b: number, c: number) 
     return ftd2xxBridge.FT_OK;
 }
 
-localFtd2xxBridge['FT_SetLatencyTimer'] = function(a: number, b: number) :number {
-    return ftd2xxBridge.FT_OK;
-}
+localFtd2xxBridge['FT_SetLatencyTimer'] = localFtd2xxBridge['FT_SetVIDPID'];
 
 localFtd2xxBridge['FT_GetLatencyTimer'] = function(a: number, buff: Buffer) :number {
     buff[0] = 1;

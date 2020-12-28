@@ -94,8 +94,11 @@ export default class MutDevice {
 
     private d2xx: D2XX;
 
-    constructor() {
+    constructor(vendor_productId?: [number, number]) {
         this.d2xx = new D2XX();
+        if(vendor_productId) {
+            D2XX.addCustomDeviceId(vendor_productId[0], vendor_productId[1]);
+        }
     }
 
     request(mutRequest: MutRequet): number | void {
