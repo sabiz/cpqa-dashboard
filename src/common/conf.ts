@@ -9,7 +9,10 @@ interface ConfLog {
 }
 
 interface ConfDevice {
-    mock: boolean
+    mock: boolean,
+    vendorId: number,
+    productId: number,
+    baudRate: number
 }
 
 const confLog = config.get<ConfLog>('log');

@@ -1,8 +1,13 @@
-// import {localFtd2xxBridge}  from './ftd2xxBridgeMock';
-// const FTD2XX = localFtd2xxBridge;
-import * as FTD2XX from './ftd2xxBridge';
+/* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+import {confDevice} from '../../common/conf';
+import logGet from '../../common/log';
+const log = logGet("D2XX");
 
-import log from '../../util/log';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+let FTD2XX = require('./ftd2xxBridge');
+if(confDevice.mock) {
+    FTD2XX = require('./ftd2xxBridgeMock');
+}
 
 export default class D2XX {
 
@@ -35,8 +40,10 @@ export default class D2XX {
         this.ftStatus = FTD2XX.FT_OK;
     }
 
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
     open(index: number): boolean  {
+        if (this.ftHandle != 0) {
+            this.close();
+        }
         const tmp =  FTD2XX.allocUint64();
         this.ftStatus = FTD2XX.FT_Open(index, tmp);
         if(this.checkErrorStatus()) {
@@ -48,6 +55,7 @@ export default class D2XX {
 
     close(): boolean {
         this.ftStatus = FTD2XX.FT_Close(this.ftHandle);
+        this.ftHandle = 0;
         return !this.checkErrorStatus();
     }
 
@@ -83,10 +91,11 @@ export default class D2XX {
 
     getLatencyTimer(): [boolean, number?] {
         const tmp =  FTD2XX.allocUchar();
-        this.ftStatus = FTD2XX.FT_GetLatencyTimer(this.ftHandle, tmp);
+        this.ftStatus = FTD2XX.FT_GetLatencyTimer(this.ftHandle, tmp.ref());
         if(this.checkErrorStatus()) {
             return [false];
         }
+
         return [true, FTD2XX.ucharRef.get(tmp, 0) as number];
     }
 
@@ -113,8 +122,8 @@ export default class D2XX {
     writeByte(uchaData: number): [boolean, number?] {
         const tmp = FTD2XX.allocUchar();
         FTD2XX.ucharRef.set(tmp, 0, uchaData);
-        const wrote = FTD2XX.allocUint64();
-        this.ftStatus = FTD2XX.FT_Write(this.ftHandle, tmp, 1, wrote);
+        const wrote = FTD2XX.allocUint();
+        this.ftStatus = FTD2XX.FT_Write(this.ftHandle, tmp.ref(), 1, wrote.ref());
         if(this.checkErrorStatus()) {
             return [false];
         }
@@ -123,8 +132,8 @@ export default class D2XX {
 
     readBuffer(size: number): [boolean, Buffer?] {
         const tmp = FTD2XX.allocUcharSize(size);
-        const read = FTD2XX.allocUint64();
-        this.ftStatus = FTD2XX.FT_Read(this.ftHandle, tmp, size, read);
+        const read = FTD2XX.allocUint();
+        this.ftStatus = FTD2XX.FT_Read(this.ftHandle, tmp.ref(), size, read.ref());
         if(this.checkErrorStatus()) {
             return [false];
         }
@@ -132,7 +141,15 @@ export default class D2XX {
     }
 
     getLastStatusString(): string {
-        switch(this.ftStatus){
+        return D2XX.getStatus2String(this.ftStatus);
+    }
+
+    private checkErrorStatus(): boolean {
+       return D2XX.checkErrorStatus(this.ftStatus);
+    }
+
+    static getStatus2String(status: number) {
+        switch(status){
             case FTD2XX.FT_OK: return 'OK';
             case FTD2XX.FT_INVALID_HANDLE: return 'INVALID_HANDLE';
             case FTD2XX.FT_DEVICE_NOT_FOUND: return 'DEVICE_NOT_FOUND';
@@ -156,11 +173,10 @@ export default class D2XX {
         return 'UNKNOWN';
     }
 
-    private checkErrorStatus(): boolean {
-       return D2XX.checkErrorStatus(this.ftStatus);
-    }
-
     static addCustomDeviceId(vendorId: number, productId: number): boolean {
+        if (process.platform==='win32') { // works on Linux or Mac
+            return true;
+        }
         const ftStatus = FTD2XX.FT_SetVIDPID(vendorId, productId);
         if(D2XX.checkErrorStatus(ftStatus)) {
             return false;
@@ -187,7 +203,18 @@ export default class D2XX {
     }
 
     private static checkErrorStatus(status: number): boolean {
+        if(status != FTD2XX.FT_OK) {
+
+            log.warn(`FTD2XX Error: ${D2XX.getStatus2String(status)}(${status})`)
+            const tmpError = new Error();
+            const caller = tmpError.stack?.split("\n")[3].trim().split(" ")[1];
+            log.verbose(`FTD2XX Error at ${caller}`);
+
+        }
+
+
         return status != FTD2XX.FT_OK;
     }
-    /* eslint-enable */
 }
+
+/* eslint-enable */

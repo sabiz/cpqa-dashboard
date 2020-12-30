@@ -2,6 +2,7 @@ import * as ffi from 'ffi-napi';
 import * as ref from 'ref-napi';
 
 export const intRef = ref.refType(ref.types.int);
+export const uintRef = ref.refType(ref.types.uint);
 export const uint64Ref = ref.refType(ref.types.uint64);
 export const ucharRef = ref.refType(ref.types.uchar);
 export const stringRef = ref.types.CString;
@@ -17,15 +18,19 @@ function alloc(size: number, type: ref.Type) : Buffer {
 }
 
 export function allocUint64():Buffer {
-    return alloc(64, ref.types.uint64);
+    return alloc(ref.types.uint64.size, ref.types.uint64);
 }
 
 export function allocInt():Buffer {
-    return alloc(4, ref.types.int);
+    return alloc(ref.types.int.size, ref.types.int);
+}
+
+export function allocUint():Buffer {
+    return alloc(ref.types.uint.size, ref.types.uint);
 }
 
 export function allocUchar():Buffer {
-    return alloc(1, ref.types.uchar);
+    return alloc(ref.types.uchar.size, ref.types.uchar);
 }
 
 export function allocUcharSize(size:number):Buffer {
@@ -41,27 +46,32 @@ export function getString(buf: Buffer): string {
 }
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const lib = ffi.Library('FTD2XX',{
-    'FT_SetVIDPID': ['int', ['uint32', 'uint32']],
-    'FT_ListDevices': ['int', [intRef, stringRef, 'uint']],
-    'FT_Open': ['int', ['int', uint64Ref]],
-    'FT_Purge': ['int', ['uint64', 'uint64']],
-    'FT_SetBaudRate': ['int', ['uint64', 'uint64']],
-    'FT_SetDataCharacteristics': ['int', ['uint64', 'uchar', 'uchar', 'uchar']],
-    'FT_SetFlowControl': ['int', ['uint64', 'ushort', 'uchar', 'uchar']],
-    'FT_SetTimeouts': ['int', ['uint64', 'uint64', 'uint64']],
-    'FT_SetLatencyTimer': ['int', ['uint64', 'uchar']],
-    'FT_GetLatencyTimer': ['int', ['uint64', ucharRef]],
-    'FT_ClrDtr': ['int', ['uint64']],
-    'FT_SetDtr': ['int', ['uint64']],
-    'FT_SetBreakOn': ['int', ['uint64']],
-    'FT_SetBreakOff': ['int', ['uint64']],
-    'FT_Write': ['int', ['uint64', 'pointer', 'uint64', uint64Ref]],
-    'FT_Read': ['int', ['uint64', 'pointer', 'uint64', uint64Ref]],
-    'FT_Close': ['int', ['uint64']],
-});
-const libAlt = ffi.Library('FTD2XX',{
-    'FT_ListDevices': ['int', ['int', stringRef, 'uint']],
+const symbols:{[key: string]: any[]} = {
+    'FT_ListDevices': ['ulong', [intRef, stringRef, 'uint']],
+    'FT_Open': ['ulong', ['int', uint64Ref]],
+    'FT_Purge': ['ulong', ['uint64', 'uint']],
+    'FT_SetBaudRate': ['ulong', ['uint64', 'uint']],
+    'FT_SetDataCharacteristics': ['ulong', ['uint64', 'uchar', 'uchar', 'uchar']],
+    'FT_SetFlowControl': ['ulong', ['uint64', 'ushort', 'uchar', 'uchar']],
+    'FT_SetTimeouts': ['ulong', ['uint64', 'uint', 'uint']],
+    'FT_SetLatencyTimer': ['ulong', ['uint64', 'uchar']],
+    'FT_GetLatencyTimer': ['ulong', ['uint64', ucharRef]],
+    'FT_ClrDtr': ['ulong', ['uint64']],
+    'FT_SetDtr': ['ulong', ['uint64']],
+    'FT_SetBreakOn': ['ulong', ['uint64']],
+    'FT_SetBreakOff': ['ulong', ['uint64']],
+    'FT_Write': ['ulong', ['uint64', 'pointer', 'uint', uintRef]],
+    'FT_Read': ['ulong', ['uint64', 'pointer', 'uint', uintRef]],
+    'FT_Close': ['ulong', ['uint64']],
+};
+let LIB_NAME = 'FTD2XX';
+if (process.platform!=='win32') {
+    symbols['FT_SetVIDPID'] = ['ulong', ['uint', 'uint']];
+    LIB_NAME = 'libftd2xx';
+}
+const lib = ffi.Library(LIB_NAME, symbols);
+const libAlt = ffi.Library(LIB_NAME,{
+    'FT_ListDevices': ['ulong', ['int', stringRef, 'uint']],
 });
 
 // Functions

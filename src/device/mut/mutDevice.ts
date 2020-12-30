@@ -1,5 +1,6 @@
 import D2XX from "../FTD2XX/d2xx";
 import MutRequet from "./request/mutRequet";
+import {confDevice} from '../../common/conf';
 import { msleep } from "sleep";
 
 import AfrMap from './request/afrMap';
@@ -94,10 +95,10 @@ export default class MutDevice {
 
     private d2xx: D2XX;
 
-    constructor(vendor_productId?: [number, number]) {
+    constructor() {
         this.d2xx = new D2XX();
-        if(vendor_productId) {
-            D2XX.addCustomDeviceId(vendor_productId[0], vendor_productId[1]);
+        if(!confDevice.mock && confDevice.vendorId && confDevice.productId) {
+            D2XX.addCustomDeviceId(confDevice.vendorId, confDevice.productId);
         }
     }
 
@@ -137,7 +138,8 @@ export default class MutDevice {
         if (!result) {
             return false;
         }
-        result = this.d2xx.setBaudRate(15625);
+        msleep(100);
+        result = this.d2xx.setBaudRate(confDevice.baudRate);
         if (!result) {
             return false;
         }

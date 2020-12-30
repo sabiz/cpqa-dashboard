@@ -3,10 +3,14 @@
       "level": 'verbose', # verbose, info, warn, error
       "fileOut": true,
       "fileName": "app.log",
-      "maxSize": 26214400, # 25M bytes
-      "maxFiles": 100
+      "maxSize": 15728640, # 15M bytes
+      "maxFiles": 5
     },
     "device": {
-      "mock": false
+      "mock": false,
+      "vendorId": 0x0403,
+      "productId": 0xcc4a,
+      "baudRate": 15625
+
     },
 }

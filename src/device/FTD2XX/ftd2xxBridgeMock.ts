@@ -1,7 +1,7 @@
 import * as ftd2xxBridge from './ftd2xxBridge';
 import * as crypto from 'crypto';
 
-export const localFtd2xxBridge = {...ftd2xxBridge};
+const localFtd2xxBridge = {...ftd2xxBridge};
 
 /* eslint-disable  @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
 localFtd2xxBridge['FT_SetVIDPID'] = function(a: number, b: number) :number {
@@ -70,3 +70,5 @@ localFtd2xxBridge['FT_Read'] = function(handle: number, buff: Buffer, size: numb
     return ftd2xxBridge.FT_OK;
 }
 /* eslint-enable */
+
+module.exports = localFtd2xxBridge;
