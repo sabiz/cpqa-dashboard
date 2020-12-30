@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "bindings": "^1.5.0",
+    "config": "^3.3.3",
     "ffi-napi": "^3.1.0",
     "node-addon-api": "^3.1.0",
     "ref-napi": "^3.0.1",
@@ -23,6 +24,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@types/config": "0.0.37",
     "@types/ffi-napi": "^2.4.3",
     "@types/node": "^14.14.14",
     "@types/ref-napi": "^1.4.1",

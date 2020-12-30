@@ -1,0 +1,12 @@
+{
+    "log": {
+      "level": 'verbose', # verbose, info, warn, error
+      "fileOut": true,
+      "fileName": "app.log",
+      "maxSize": 26214400, # 25M bytes
+      "maxFiles": 100
+    },
+    "device": {
+      "mock": false
+    },
+}
