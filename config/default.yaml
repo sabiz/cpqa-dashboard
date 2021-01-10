@@ -1,16 +1,36 @@
 {
-    "log": {
-      "level": 'verbose', # verbose, info, warn, error
-      "fileOut": true,
-      "fileName": "app.log",
-      "maxSize": 15728640, # 15M bytes
-      "maxFiles": 5
-    },
-    "device": {
-      "mock": false,
-      "vendorId": 0x0403,
-      "productId": 0xcc4a,
-      "baudRate": 15625
-
-    },
+  "app": {
+    "port": 3000,
+    "displayItems": [  # see [MutRequests] at src/mutClient.ts
+      {
+        "name": "CoolantTemperature",
+        "intervalMs": 100
+      },
+      {
+        "name": "BatteryLevel",
+        "intervalMs": 15000
+      },
+      {
+        "name": "AirTemperature",
+        "intervalMs": 15000
+      },
+      {
+        "name": "Barometer",
+        "intervalMs": 15000
+      },
+    ]
+  },
+  "log": {
+    "level": 'verbose', # verbose, info, warn, error
+    "fileOut": true,
+    "fileName": "app.log",
+    "maxSize": 15728640, # 15M bytes
+    "maxFiles": 5
+  },
+  "device": {
+    "mock": false,
+    "vendorId": 0x0403,
+    "productId": 0xcc4a,
+    "baudRate": 15625
+  }
 }

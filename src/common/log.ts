@@ -1,7 +1,7 @@
 import * as winston from "winston";
 import {confLog} from './conf';
 
-const loggerCache:Map<string,winston.Logger> = new Map();
+const loggerCache:Map<string,winston.Logger> = new Map<string,winston.Logger>();
 const fmt = winston.format;
 
 
@@ -17,8 +17,8 @@ function get(name: string): winston.Logger {
             fmt.timestamp({format: "YYYY/MM/DD-HH:mm:ss.SSSZZ"}),
             fmt.label({label: name}),
             fmt.simple(),
-            fmt.printf(info => {
-                return `${info.timestamp} [${info.label.toUpperCase()}|${info.level.toUpperCase()}]: ${info.message}`
+            fmt.printf((info:winston.Logform.TransformableInfo) => {
+                return `${info.timestamp as number} [${(info.label as string).toUpperCase()}|${info.level.toUpperCase()}]: ${info.message}`
             })
         ), 
         transports: [

@@ -15,10 +15,22 @@ interface ConfDevice {
     baudRate: number
 }
 
+interface DisplayItem {
+    name: string,
+    intervalMs: number
+}
+
+interface ConfApp {
+    port: number,
+    displayItems: Array<DisplayItem>
+}
+
 const confLog = config.get<ConfLog>('log');
 const confDevice = config.get<ConfDevice>('device');
+const confApp = config.get<ConfApp>('app');
 
 export {
     confLog,
-    confDevice
+    confDevice,
+    confApp
 };

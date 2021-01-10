@@ -135,6 +135,7 @@ tags
 [._]*.un~
 
 ### vscode ###
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -146,3 +147,6 @@ tags
 
 # node-gyp
 build
+
+# sapper
+__sapper__
