@@ -156,7 +156,7 @@ class Mut : public Napi::ObjectWrap<Mut> {
         FT_STATUS status = FT_Write(this->ftHandle, &requestId, sizeof(UCHAR), &length);
         if(!FT_SUCCESS(status)) return makeResult(env, noResult, status);
         SLEEP_MS(2);
-        char readBuff[2];
+        UCHAR readBuff[2];
         status = FT_Read(this->ftHandle, readBuff, sizeof(readBuff), &length);
         if(!FT_SUCCESS(status)) return makeResult(env, noResult, status);
 
