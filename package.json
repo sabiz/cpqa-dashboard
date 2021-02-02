@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "sapper dev",
-    "start": "sapper build",
+    "build": "sapper build",
     "native:build": "node-gyp rebuild --verbose",
     "native:clean": "node-gyp clean",
     "lint": "eslint src --ext .js,.ts,.svelte"
