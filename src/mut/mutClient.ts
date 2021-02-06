@@ -7,8 +7,9 @@ import getLogger from '../common/log';
 const log = getLogger('MUT');
 
 
-// const {Mut} = require('bindings')('Mut');
-import {Mut} from './mutDummy';
+const {Mut} = require('bindings')('Mut');
+// For DEBUG
+// import {Mut} from './mutDummy';
 
 
 import AfrMap from './request/afrMap';
