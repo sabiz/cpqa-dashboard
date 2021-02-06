@@ -4,24 +4,24 @@
     "displayItems": [  # see [MutRequests] at src/mutClient.ts
       {
         "name": "CoolantTemperature",
-        "intervalMs": 100
+        "intervalMs": 1000
       },
       {
         "name": "BatteryLevel",
         "intervalMs": 15000
       },
       {
-        "name": "AirTemperature",
-        "intervalMs": 15000
+        "name": "MafAirTemperature",
+        "intervalMs": 1000
       },
       {
-        "name": "Barometer",
-        "intervalMs": 15000
+        "name": "FuelConsumption",
+        "intervalMs": 5000
       },
     ]
   },
   "log": {
-    "level": 'verbose', # verbose, info, warn, error
+    "level": 'info', # verbose, info, warn, error
     "fileOut": true,
     "fileName": "app.log",
     "maxSize": 15728640, # 15M bytes
