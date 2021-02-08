@@ -5,12 +5,17 @@
 	import ValueItem from '../components/ValueItem.svelte';
 	import constants from '../common/constants';
 	import type MutMessage from '../mut/mutMessage';
-	let socket: WebSocket;
+	let socket: WebSocket = null;
 	let valueItems = [
 		{},{},{},{}
 	];
 
 	function createNewSocket() {
+
+		if(socket !== null) {
+			socket.close();
+		}
+
 		socket = new WebSocket(`ws://${location.hostname}:${constants.WS_SERVER_PORT}`);
 		socket.addEventListener("open", onOpenSocket);
 		socket.addEventListener("close", onCloseSocket);
@@ -43,7 +48,25 @@
 		}, 1000);
 	}
 
-	onMount(createNewSocket);
+	function handleVisibilityChange() {
+		if (document.hidden) {
+
+		} else {
+			createNewSocket();
+		}
+	}
+
+	function handleOnline() {
+		createNewSocket();
+	}
+
+	function init() {
+		window.addEventListener("online", handleOnline);
+		document.addEventListener("visibilitychange", handleVisibilityChange, false);
+		createNewSocket();
+	}
+
+	onMount(init);
 
 </script>
 
