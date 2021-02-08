@@ -4,19 +4,19 @@
     "displayItems": [  # see [MutRequests] at src/mutClient.ts
       {
         "name": "CoolantTemperature",
-        "intervalMs": 1000
+        "intervalMs": 5000
       },
       {
         "name": "BatteryLevel",
         "intervalMs": 15000
       },
       {
-        "name": "MafAirTemperature",
-        "intervalMs": 1000
+        "name": "AirVolume",
+        "intervalMs": 1500
       },
       {
-        "name": "FuelConsumption",
-        "intervalMs": 5000
+        "name": "ThrottlePosition",
+        "intervalMs": 750
       },
     ]
   },
