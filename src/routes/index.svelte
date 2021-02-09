@@ -3,9 +3,11 @@
 
 	import { onMount } from 'svelte';
 	import ValueItem from '../components/ValueItem.svelte';
+	import ConnectionStatus from '../components/ConnectionStatus.svelte';
 	import constants from '../common/constants';
 	import type MutMessage from '../mut/mutMessage';
 	let socket: WebSocket = null;
+	let isConnected = false;
 	let valueItems = [
 		{},{},{},{}
 	];
@@ -29,7 +31,7 @@
 	}
 
 	function onOpenSocket(ev) {
-		// NOP
+		isConnected = true;
 	}
 
 	function onCloseSocket(ev: CloseEvent) {
@@ -37,6 +39,7 @@
 			socket = null;
 			createNewSocket();
 		}, 1000);
+		isConnected = false;
 	}
 
 	function onErrorSocket(ev) {
@@ -81,6 +84,12 @@
 	.container-item {
 		width: 100%;
 	}
+
+	.status {
+		bottom: 0.5vh;
+		left: 0.5vw;
+		position: absolute;
+	}
 </style>
 
 <svelte:head>
@@ -88,6 +97,9 @@
 </svelte:head>
 
 <div class="container">
+	<div  class="status">
+		<ConnectionStatus isConnected/>
+	</div>
 	<div class="container-item">
 		<ValueItem {...valueItems[0]}/>
 	</div>
