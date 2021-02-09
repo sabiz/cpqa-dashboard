@@ -139,7 +139,9 @@ export default class MutClient {
                 multi.subValues[i] = tmp;
             }
         }
-        return request.eval(result.value);
+        const resultValue = request.eval(result.value);
+        log.verbose(`MutRequest(${request.nameShort}):\t ${resultValue}`);
+        return resultValue;
     }
 
     existDevice(): boolean {
