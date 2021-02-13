@@ -18,6 +18,7 @@ class MutProvider {
     private wsServer: WsServer;
     private mutClient: MutClient;
     private requestTable: Array<RequestJob>;
+    private mutRequestIntervalIds: Array<NodeJS.Timeout>;
 
     constructor() {
         this.wsServer = new WsServer({ port: constants.WS_SERVER_PORT });
@@ -31,6 +32,7 @@ class MutProvider {
                 interval: v.intervalMs
             }
         });
+        this.mutRequestIntervalIds = new Array<NodeJS.Timeout>();
 
         setTimeout(()=>{this.initDevice()}, 300);
     }
@@ -67,6 +69,11 @@ class MutProvider {
 
     private onProcessMutRequest(id: number, mutRequest: MutRequest) {
         const val = this.mutClient.request(mutRequest);
+        if(val === null) {
+            log.info("Device connection reset");
+            this.resetAndRestartRequest();
+            return;
+        }
         const sendData = JSON.stringify({
             id: id,
             name: mutRequest.nameShort,
@@ -80,11 +87,20 @@ class MutProvider {
           });
     }
 
+    private resetAndRestartRequest() {
+        this.mutRequestIntervalIds.forEach((v) => clearInterval(v));
+        this.mutRequestIntervalIds.splice(0);
+
+        this.mutClient.close();
+        setTimeout(()=>{this.initDevice()}, 100);
+    }
+
     private startRequest() {
         this.requestTable.forEach((v, idx) => {
-            setInterval(() => {
+            const id = setInterval(() => {
                 this.onProcessMutRequest(idx, v.req);
             }, v.interval);
+            this.mutRequestIntervalIds.push(id);
         });
     }
 }

@@ -101,13 +101,17 @@ export const MutRequests = {
 
 export default class MutClient {
 
+    private static MAX_HISTORY_COUNT = 25;
+    private static MIN_HISTORY_COUNT = 5;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mut: any;
+    requestHistory: Number[]
 
     constructor() {
         const vendorId = confDevice.vendorId;
         const productId = confDevice.productId;
         this.mut = new Mut(vendorId, productId);
+        this.requestHistory = new Array<Number>();
     }
 
     open(index: number): boolean {
@@ -121,7 +125,7 @@ export default class MutClient {
         log.verbose("closed");
     }
 
-    request(request: MutRequest):number {
+    request(request: MutRequest):number|null {
         const result = this.mut.request(request.requestId) as MutResult;
         if(!result.isSuccess) {
             log.warning(`request failed: ${JSON.stringify(result)}`);
@@ -141,11 +145,41 @@ export default class MutClient {
         }
         const resultValue = request.eval(result.value);
         log.verbose(`MutRequest(${request.nameShort}):\t ${resultValue}`);
+
+        const hasCon = this.hasMutConnection(result.value);
+
+        if(!hasCon) {
+            return null;
+        }
         return resultValue;
     }
 
     existDevice(): boolean {
         const result =this.mut.deviceCount as MutResult;
         return (result.value as number > 0);
+    }
+
+    private hasMutConnection(value: Number):boolean {
+        /**
+         * [Checking connection]
+         * 
+         * If the connection is lost,
+         * response will be same regardless of MUT request.
+         */
+
+         this.requestHistory.push(value);
+
+         if(this.requestHistory.length < MutClient.MIN_HISTORY_COUNT) {
+             return true;
+         }
+
+         if(this.requestHistory.length > MutClient.MAX_HISTORY_COUNT) {
+             this.requestHistory.shift();
+         }
+
+         const uniqValues = Array.from(new Set(this.requestHistory));
+
+         return uniqValues.length !== 1;
+
     }
 }
