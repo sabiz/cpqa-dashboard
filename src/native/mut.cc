@@ -1,4 +1,9 @@
 #define FTD2XX_EXPORTS
+#include <iostream>
+
+#include <string>
+#include <cstdio>
+#include <vector>
 
 #include <map>
 #include <thread>
@@ -10,6 +15,20 @@
 #define MUT_TIMEOUT 1000
 #define OPEN_RETRY_COUNT 10
 #define SLEEP_MS(t) (std::this_thread::sleep_for(std::chrono::milliseconds(t)))
+
+#define LOG_VERBOSE 0
+#define LOG_INFO 1
+#define LOG_WARN 2
+#define LOG_ERROR 3
+
+template <typename ... Args>
+std::string format(const std::string& fmt, Args ... args )
+{
+    size_t len = std::snprintf( nullptr, 0, fmt.c_str(), args ... );
+    std::vector<char> buf(len + 1);
+    std::snprintf(&buf[0], len + 1, fmt.c_str(), args ... );
+    return std::string(&buf[0], &buf[0] + len);
+}
 
 const std::map<FT_STATUS, std::string> STATUS_STR_TABLE = {
     {FT_OK, "OK"},
@@ -34,14 +53,12 @@ const std::map<FT_STATUS, std::string> STATUS_STR_TABLE = {
     {FT_DEVICE_LIST_NOT_READY, "DEVICE_LIST_NOT_READY"},
 };
 
-
-
 class Mut : public Napi::ObjectWrap<Mut> {
-
-    
+ 
   private:
     static Napi::FunctionReference constructor;
     FT_HANDLE ftHandle;
+    Napi::Function loggingFunc;
     Napi::Value makeResult(Napi::Env env, Napi::Number value, FT_STATUS status) {
         Napi::Object result = Napi::Object::New(env);
         result.Set("value", value);
@@ -160,6 +177,7 @@ class Mut : public Napi::ObjectWrap<Mut> {
         status = FT_Read(this->ftHandle, readBuff, sizeof(readBuff), &length);
         if(!FT_SUCCESS(status)) return makeResult(env, noResult, status);
 
+        this->log(LOG_VERBOSE, env, format("MUT tx: %02x / rx: %02x,%02x", requestId, readBuff[0], readBuff[1]));
         return makeResult(env, Napi::Number::New(env, readBuff[1]), status);
     }
 
@@ -168,6 +186,10 @@ class Mut : public Napi::ObjectWrap<Mut> {
         FT_STATUS status = FT_ListDevices(&numDevs,NULL,FT_LIST_NUMBER_ONLY);
         Napi::Env env = info.Env();
         return makeResult(env, Napi::Number::New(env, numDevs), status);
+    }
+
+    void log(UCHAR level, Napi::Env env, const std::string msg) {
+        this->loggingFunc.Call(env.Global(), {Napi::Number::New(env, level), Napi::String::New(env, msg)});
     }
 
   public:
@@ -193,7 +215,9 @@ Mut::Mut(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Mut>(info) {
     Napi::Number pId = info[1].As<Napi::Number>();
     DWORD product = pId.Int32Value();
 
+    this->loggingFunc = info[2].As<Napi::Function>();
 #ifndef WIN32
+    this->log(LOG_VERBOSE, info.Env(), format("VID: %04lx, PID: %04lx", vId, pId));
     FT_SetVIDPID(vender, product);
 #endif
 

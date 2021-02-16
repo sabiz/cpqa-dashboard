@@ -110,7 +110,7 @@ export default class MutClient {
     constructor() {
         const vendorId = confDevice.vendorId;
         const productId = confDevice.productId;
-        this.mut = new Mut(vendorId, productId);
+        this.mut = new Mut(vendorId, productId, this.logFromNative);
         this.requestHistory = new Array<Number>();
     }
 
@@ -181,5 +181,21 @@ export default class MutClient {
 
          return uniqValues.length !== 1;
 
+    }
+
+    private logFromNative(level: number, msg: string) {
+        let func = log.verbose;
+        switch(level) {
+        case 1:
+            func = log.info;
+            break;
+        case 2:
+            func = log.warning;
+            break;
+        case 3:
+            func = log.error;
+            break;
+        }
+        func("[NATIVE]: " + msg);
     }
 }
