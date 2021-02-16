@@ -216,8 +216,9 @@ Mut::Mut(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Mut>(info) {
     DWORD product = pId.Int32Value();
 
     this->loggingFunc = info[2].As<Napi::Function>();
+
 #ifndef WIN32
-    this->log(LOG_VERBOSE, info.Env(), format("VID: %04lx, PID: %04lx", vId, pId));
+    this->log(LOG_VERBOSE, info.Env(), format("VID: %04lx, PID: %04lx", vender, product));
     FT_SetVIDPID(vender, product);
 #endif
 
