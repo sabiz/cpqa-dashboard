@@ -2,7 +2,7 @@ import WebSocket, {Server as WsServer} from 'ws';
 import getLog from './common/log';
 import MutClient, {MutRequests} from './mut/mutClient';
 import constants from './common/constants';
-import {confApp} from './common/conf';
+import {confApp, confDevice} from './common/conf';
 import type MutRequest from './mut/request/mutRequest';
 import type MutMessage from './mut/mutMessage';
 
@@ -24,7 +24,7 @@ class MutProvider {
         this.wsServer = new WsServer({ port: constants.WS_SERVER_PORT });
         this.wsServer.on("connection", () => this.onNewConnection());
         this.wsServer.on("close", () => this.onCloseConnection());
-        this.mutClient = new MutClient();
+        this.mutClient = new MutClient(confDevice.mock);
 
         this.requestTable = confApp.displayItems.map((v) => {
             return {

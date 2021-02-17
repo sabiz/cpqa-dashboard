@@ -9,7 +9,7 @@ const log = getLogger('MUT');
 
 const {Mut} = require('bindings')('Mut');
 // For DEBUG
-// import {Mut} from './mutDummy';
+import {Mut as MutDummy} from './mutDummy';
 
 
 import AfrMap from './request/afrMap';
@@ -107,10 +107,15 @@ export default class MutClient {
     mut: any;
     requestHistory: Number[]
 
-    constructor() {
+    constructor(dummy: boolean) {
         const vendorId = confDevice.vendorId;
         const productId = confDevice.productId;
-        this.mut = new Mut(vendorId, productId, this.logFromNative);
+        if(dummy) {
+            this.mut = new MutDummy(vendorId, productId, this.logFromNative);
+        } else {
+            this.mut = new Mut(vendorId, productId, this.logFromNative);
+        }
+
         this.requestHistory = new Array<Number>();
     }
 

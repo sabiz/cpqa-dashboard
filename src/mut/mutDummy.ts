@@ -7,7 +7,7 @@ export class Mut{
 
     deviceCount: MutResult;
 
-    constructor(vendorId: number, productId: number) {
+    constructor(vendorId: number, productId: number, logFunc: Function) {
         this.deviceCount = {
             value: 1,
             status: 'OK',
