@@ -128,7 +128,7 @@ export default class MutClient {
     request(request: MutRequest):number|null {
         const result = this.mut.request(request.requestId) as MutResult;
         if(!result.isSuccess) {
-            log.warning(`request failed: ${JSON.stringify(result)}`);
+            log.warn(`request failed: ${JSON.stringify(result)}`);
             return 0;
         }
 
@@ -190,7 +190,7 @@ export default class MutClient {
             func = log.info;
             break;
         case 2:
-            func = log.warning;
+            func = log.warn;
             break;
         case 3:
             func = log.error;
