@@ -26,6 +26,13 @@ onMount(async () => {
     color: #eb6ea5;
 }
 
+span {
+    display: none;
+}
+.heart {
+    display: inherit;
+}
+
 @keyframes flash {
     0%,100% {
         opacity: 1;
@@ -39,10 +46,6 @@ onMount(async () => {
 </style>
 
 <div class="{className}" class:notConnected={!isConnected} class:connected={isConnected}>
-    {#if isConnected}
-        <i class="fas fa-heart"></i>
-    {:else}
-        <i class="fas fa-heart-broken"></i>
-        Not connected
-    {/if}
+        <span class:heart={isConnected}><i class="fas fa-heart"></i></span>
+        <span class:heart={!isConnected}><i class="fas fa-heart-broken"></i>Not connected</span>
 </div>

@@ -74,8 +74,7 @@
 
 </script>
 
-<style>
-
+<style lang="scss">
 	.container {
 		height: 100%;
 		display: grid;
@@ -90,7 +89,15 @@
 		top: 0.5vh;
 		right: 1.0vw;
 		position: absolute;
+		display: flex;
+		flex-direction: column;
+
+		div {
+ 		   align-self: flex-end;
+		}
 	}
+
+
 </style>
 
 <svelte:head>
@@ -112,8 +119,8 @@
 	</div>
 
 	<div  class="status">
-		<ConnectionStatus isConnected/>
-			<ReloadButton />
+		<div><ConnectionStatus isConnected={isConnected}/></div>
+		<div><ReloadButton /></div>
 	</div>
 </div>
 

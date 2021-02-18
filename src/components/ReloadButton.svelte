@@ -14,10 +14,9 @@
     </script>
     
     <style lang="scss">
-        div{
-            z-index: 2;
+        div {
+            display: inline;
         }
-
     </style>
     
     <div on:click={onClick}>
