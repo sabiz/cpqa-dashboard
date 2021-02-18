@@ -2,8 +2,14 @@ html, body, #sapper {
 	height: 100%;
 }
 
+@font-face {
+	font-family: "AppFont";
+	src: url(mplus-1m-regular.ttf);
+}
+
+
 body {
 	margin: 0;
-	font-family: "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro", "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "メイリオ", sans-serif;
+	font-family: "AppFont", "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "メイリオ", sans-serif;
 	overflow: hidden;
 }

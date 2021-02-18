@@ -8,23 +8,27 @@
     $: formatValue = Number.isInteger(value)? value: value.toFixed(1);
 
     const BASE_FONT_SIZE = 14;
+    const FONT_SCALE_WIDTH_COE = 0.9;
+    const FONT_SCALE_HEIGHT_COE = 1.0;
     let rootElm: HTMLElement;
     let valueElm: HTMLElement;
 
     function fitFont() {
-        const valueBox = valueElm.getBoundingClientRect();
-        if(valueBox.width < rootElm.clientWidth*0.8
-            && valueBox.height < rootElm.clientHeight*0.8) {
-                let currentFont = parseInt(valueElm.style.fontSize.replace('px', ''));
-                currentFont+=1;
-                valueElm.style.fontSize = `${currentFont}px`;
-                fitFont();
-        } else if(valueBox.width > rootElm.clientWidth*0.8
-            && valueBox.height > rootElm.clientHeight*0.8) {
-                let currentFont = parseInt(valueElm.style.fontSize.replace('px', ''));
-                currentFont-=1;
-                valueElm.style.fontSize = `${currentFont}px`;
-                fitFont();
+        let valueBox = valueElm.getBoundingClientRect();
+        let currentFont = parseInt(valueElm.style.fontSize.replace('px', ''));
+        while(valueBox.width < rootElm.clientWidth*FONT_SCALE_WIDTH_COE
+                && valueBox.height < rootElm.clientHeight*FONT_SCALE_HEIGHT_COE) {
+            currentFont+=1;
+            valueElm.style.fontSize = `${currentFont}px`;
+            valueBox = valueElm.getBoundingClientRect();
+            currentFont = parseInt(valueElm.style.fontSize.replace('px', ''));
+        }
+        while(valueBox.width > rootElm.clientWidth*FONT_SCALE_WIDTH_COE
+                || valueBox.height > rootElm.clientHeight*FONT_SCALE_HEIGHT_COE) {
+            currentFont-=1;
+            valueElm.style.fontSize = `${currentFont}px`;
+            valueBox = valueElm.getBoundingClientRect();
+            currentFont = parseInt(valueElm.style.fontSize.replace('px', ''));
         }
     }
 
@@ -59,10 +63,14 @@ $margin-size: 5%;
     top: $margin-size;
     left: $margin-size;
     text-transform: uppercase;
+    font-size: 1.25em;
 }
 
 .value {
-    display: inline;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
 }
 
 .unit {
