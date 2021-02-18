@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import ValueItem from '../components/ValueItem.svelte';
 	import ConnectionStatus from '../components/ConnectionStatus.svelte';
+	import ReloadButton from '../components/ReloadButton.svelte';
 	import constants from '../common/constants';
 	import type MutMessage from '../mut/mutMessage';
 	let socket: WebSocket = null;
@@ -86,8 +87,8 @@
 	}
 
 	.status {
-		bottom: 0.5vh;
-		left: 0.5vw;
+		top: 0.5vh;
+		right: 1.0vw;
 		position: absolute;
 	}
 </style>
@@ -97,9 +98,6 @@
 </svelte:head>
 
 <div class="container">
-	<div  class="status">
-		<ConnectionStatus isConnected/>
-	</div>
 	<div class="container-item">
 		<ValueItem {...valueItems[0]}/>
 	</div>
@@ -113,6 +111,9 @@
 		<ValueItem {...valueItems[3]}/>
 	</div>
 
-	
+	<div  class="status">
+		<ConnectionStatus isConnected/>
+			<ReloadButton />
+	</div>
 </div>
 
