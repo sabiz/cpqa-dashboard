@@ -1,5 +1,4 @@
 #define FTD2XX_EXPORTS
-#include <iostream>
 
 #include <string>
 #include <cstdio>
@@ -22,8 +21,7 @@
 #define LOG_ERROR 3
 
 template <typename ... Args>
-std::string format(const std::string& fmt, Args ... args )
-{
+std::string format(const std::string& fmt, Args ... args ) {
     size_t len = std::snprintf( nullptr, 0, fmt.c_str(), args ... );
     std::vector<char> buf(len + 1);
     std::snprintf(&buf[0], len + 1, fmt.c_str(), args ... );
@@ -58,7 +56,8 @@ class Mut : public Napi::ObjectWrap<Mut> {
   private:
     static Napi::FunctionReference constructor;
     FT_HANDLE ftHandle;
-    Napi::Function loggingFunc;
+    Napi::FunctionReference loggingFunc;
+
     Napi::Value makeResult(Napi::Env env, Napi::Number value, FT_STATUS status) {
         Napi::Object result = Napi::Object::New(env);
         result.Set("value", value);
@@ -74,6 +73,7 @@ class Mut : public Napi::ObjectWrap<Mut> {
     }
 
     Napi::Value Open(const Napi::CallbackInfo &info) {
+        this->log(LOG_VERBOSE, info.Env(), "Mut open...");
         if(this->ftHandle != NULL) {
             this->Close(info);
         }
@@ -118,6 +118,8 @@ class Mut : public Napi::ObjectWrap<Mut> {
         if(!FT_SUCCESS(status)) return makeResult(env, status);
         SLEEP_MS(600);
 
+        this->log(LOG_VERBOSE, info.Env(), "Mut setup done");
+
         char req[1] = {0x17};
         DWORD writtenLength = 0;
         char openCheckBuff[2];
@@ -132,8 +134,9 @@ class Mut : public Napi::ObjectWrap<Mut> {
 
             status = FT_Read(this->ftHandle, openCheckBuff, sizeof(openCheckBuff), &returnedLength);
             if(!FT_SUCCESS(status)) return makeResult(env, status);
-            
+
             if(openCheckBuff[1] != 0) { // already open
+                this->log(LOG_VERBOSE, info.Env(), "Mut open done");
                 return makeResult(env, status);
             }
 
@@ -148,15 +151,18 @@ class Mut : public Napi::ObjectWrap<Mut> {
             if(!FT_SUCCESS(status)) return makeResult(env, status);
 
             if(readBuff[0] != readBuff[1] && readBuff[2] != readBuff[3]) {
+                this->log(LOG_VERBOSE, info.Env(), "Mut open done");
                 return makeResult(env, status);
             }
+            this->log(LOG_VERBOSE, env, format("MUT open retry: %d", i));
             SLEEP_MS(10);
         }
-
+        this->log(LOG_VERBOSE, info.Env(), "Mut open failed");
         return makeResult(env, FT_OTHER_ERROR);
     }
 
     void Close(const Napi::CallbackInfo &info) {
+        this->log(LOG_VERBOSE, info.Env(), "Mut close");
         if(this->ftHandle == NULL) {
             return;
         }
@@ -215,7 +221,7 @@ Mut::Mut(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Mut>(info) {
     Napi::Number pId = info[1].As<Napi::Number>();
     DWORD product = pId.Int32Value();
 
-    this->loggingFunc = info[2].As<Napi::Function>();
+    this->loggingFunc = Napi::Persistent(info[2].As<Napi::Function>());
 
 #ifndef WIN32
     this->log(LOG_VERBOSE, info.Env(), format("VID: %04lx, PID: %04lx", vender, product));
