@@ -10,21 +10,23 @@ export default class FuelConsumption implements MutRequest, MultiRequest {
     readonly unitStr: string = "km/L";
     readonly min: number = 0;
     readonly max: number = 50;
-    readonly HISTORY_LENGTH = 50;
+    readonly HISTORY_LENGTH = 100;
 
     readonly subRequests: Array<MutRequest> = [new InjectorPulseWidth(), new Speed()];
     subValues: Array<number> = [0, 0];
     evalHistory: Array<number> = [];
+    lastValue: number = 0;
 
     eval(x: number): number {
         if (this.subValues[1] == 0) {
-            return 0;
+            return this.lastValue;
         }
-        const tmp = x*this.subValues[0]*20*6/this.subValues[1]/1200;
+        const tmp = 31.25*x*this.subValues[0]*20*6/this.subValues[1]/1200;
         if(tmp <= 0) {
-            return 0;
+            return this.lastValue;
         }
-        return this.calcMean(1/(100/tmp));
+        this.lastValue = this.calcMean(100/tmp);
+        return this.lastValue;
     }
 
     private calcMean(value:number):number {
